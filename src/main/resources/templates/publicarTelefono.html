@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Publicar Teléfono</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .logo-container img {
+            height: 70px;
+            width: auto;
+            transition: transform 0.3s;
+        }
+        .logo-container:hover img {
+            transform: scale(1.05);
+        }
+        .menu {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+            align-items: center;
+        }
+        .menu li a, .logout-btn {
+            color: white;
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        .menu li a:hover {
+            background-color: #34495e;
+            transform: translateY(-2px);
+        }
+        .logout-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .logout-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+        .logout-box {
+            display: none;
+            position: absolute;
+            right: 30px;
+            top: 80px;
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            z-index: 1000;
+            text-align: center;
+        }
+        .logout-box.visible {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .logout-box p {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        .logout-box button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .logout-box .yes-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .logout-box .yes-btn:hover {
+            background-color: #c0392b;
+        }
+        .logout-box .no-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        .logout-box .no-btn:hover {
+            background-color: #2980b9;
+        }
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .preview-img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            display: none;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+            display: none;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #2c3e50;
+            color: white;
+            margin-top: 30px;
+        }
+        .footer-content p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="https://github.com/Rdrr01/celfinder-resource/blob/main/logo.png?raw=true" alt="Logo Biblioteca" class="logo">
+        </div>
+        <nav class="menu-container">
+            <ul class="menu">
+                <li><a href="/admin">Comparador Media Actual</a></li>
+                <li><a href="/usuarios/listar">Comparador Celular</a></li>
+                <li><a href="/notificaciones">Historial</a></li>
+                <li><a href="/reportes">Mercado</a></li>
+                <li class="logout-item">
+                    <button id="logout-btn" class="logout-btn">Cerrar Sesión</button>
+                    <div class="logout-box" id="logout-box">
+                        <p>¿Estás seguro de cerrar sesión?</p>
+                        <button class="yes-btn">Sí</button>
+                        <button class="no-btn">No</button>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 class="mb-4">Publicar Teléfono en Venta</h1>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+        
+        <form th:action="@{/ventas/publicar}" th:object="${telefono}" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <div class="form-group">
+                <label for="nombre">Nombre del Teléfono:</label>
+                <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required>
+            </div>
+            <div class="form-group">
+                <label for="precio">Precio ($):</label>
+                <input type="number" class="form-control" id="precio" th:field="*{precio}" step="0.01" required>
+                <span id="precioError" class="error">El precio debe ser mayor o igual a $50,000.</span>
+            </div>
+            <div class="form-group">
+                <label for="estado">Estado:</label>
+                <select class="form-control" id="estado" th:field="*{estado}" required>
+                    <option value="nuevo">Nuevo</option>
+                    <option value="usado">Usado</option>
+                    <option value="reacondicionado">Reacondicionado</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="descripcion">Descripción:</label>
+                <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="imagen">Subir Imagen:</label>
+                <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*" onchange="previewImage(event)">
+                <img id="preview" class="preview-img" alt="Previsualización de la imagen">
+            </div>
+            <h3>Especificaciones Técnicas</h3>
+            <div class="form-group">
+                <label for="ghz">Frecuencia (GHz):</label>
+                <input type="number" class="form-control" id="ghz" th:field="*{ghz}" step="0.1" required>
+            </div>
+            <div class="form-group">
+                <label for="camara">Cámara (MP):</label>
+                <input type="number" class="form-control" id="camara" th:field="*{camara}" required>
+            </div>
+            <div class="form-group">
+                <label for="ram">RAM (GB):</label>
+                <input type="number" class="form-control" id="ram" th:field="*{ram}" required>
+            </div>
+            <div class="form-group">
+                <label for="bateria">Batería (mAh):</label>
+                <input type="number" class="form-control" id="bateria" th:field="*{bateria}" required>
+            </div>
+            <div class="form-group">
+                <label for="almacenamiento">Almacenamiento (GB):</label>
+                <input type="number" class="form-control" id="almacenamiento" th:field="*{almacenamiento}" required>
+            </div>
+            <div class="form-group">
+                <label for="nombreCpu">Nombre del CPU:</label>
+                <input type="text" class="form-control" id="nombreCpu" th:field="*{nombreCpu}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Publicar</button>
+            <a th:href="@{/ventas/listar}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2025 CellFinder TechMatch</p>
+            <p>Dirección: La Universidad Cedesarrollo, Cartagena, Bolívar</p>
+            <p>Teléfono: +57 3126409354</p>
+            <p>Email: edderespitia@gmail.com</p>
+            <p>Integrantes: Edder Espitia y Ruben Ruiz</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Funcionalidad de cierre de sesión
+            const logoutBtn = document.getElementById('logout-btn');
+            const logoutBox = document.getElementById('logout-box');
+            const yesBtn = logoutBox.querySelector('.yes-btn');
+            const noBtn = logoutBox.querySelector('.no-btn');
+
+            logoutBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                logoutBox.classList.toggle('visible');
+            });
+
+            document.addEventListener('click', function() {
+                logoutBox.classList.remove('visible');
+            });
+
+            logoutBox.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            yesBtn.addEventListener('click', function() {
+                alert('Sesión cerrada');
+                logoutBox.classList.remove('visible');
+                window.location.href = '/logout';
+            });
+
+            noBtn.addEventListener('click', function() {
+                logoutBox.classList.remove('visible');
+            });
+        });
+
+        function previewImage(event) {
+            const preview = document.getElementById('preview');
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        function validateForm() {
+            const precio = document.getElementById('precio').value;
+            const precioError = document.getElementById('precioError');
+            if (precio < 50000) {
+                precioError.style.display = 'block';
+                return false;
+            } else {
+                precioError.style.display = 'none';
+                return true;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparación de Teléfonos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Navigation Bar -->
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a th:href="@{/ventas/listar}" class="text-2xl font-bold">Mercado</a>
+            <div>
+                <a th:href="@{/ventas/notificaciones}" class="mr-4 hover:underline">Notificaciones</a>
+                <a href="#" onclick="document.getElementById('logout-modal').classList.remove('hidden')" class="hover:underline">Cerrar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Logout Modal -->
+    <div id="logout-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-lg font-semibold mb-4">¿Estás seguro de cerrar sesión?</h2>
+            <div class="flex justify-end">
+                <a th:href="@{/logout}" class="bg-blue-600 text-white px-4 py-2 rounded mr-2 hover:bg-blue-700">Sí</a>
+                <button onclick="document.getElementById('logout-modal').classList.add('hidden')" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto mt-8 p-4">
+        <h1 class="text-3xl font-bold text-center mb-8">Comparación de Teléfonos</h1>
+
+        <!-- Comparison Results -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Resultados de la Comparación</h2>
+            <div th:if="${resultados.isEmpty()}" class="text-gray-600">
+                No se encontraron resultados de comparación.
+            </div>
+            <ul th:if="${!resultados.isEmpty()}" class="list-disc pl-6">
+                <li th:each="resultado : ${resultados}" th:text="${resultado}" class="mb-2"></li>
+            </ul>
+        </div>
+
+        <!-- Phone Details -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Phone 1 -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4" th:text="${telefono1.nombre}">Teléfono 1</h2>
+                <div th:if="${telefono1.imagenBase64}" class="mb-4">
+                    <img th:src="@{'data:image/jpeg;base64,' + ${telefono1.imagenBase64}}" alt="Imagen del Teléfono" class="w-full h-48 object-cover rounded">
+                </div>
+                <p><strong>Precio:</strong> <span th:text="${telefono1.precio}">0.00</span></p>
+                <p><strong>Estado:</strong> <span th:text="${telefono1.estado}">N/A</span></p>
+                <p><strong>Frecuencia (GHz):</strong> <span th:text="${telefono1.ghz}">0.0</span></p>
+                <p><strong>Cámara (MP):</strong> <span th:text="${telefono1.camara}">0</span></p>
+                <p><strong>RAM (GB):</strong> <span th:text="${telefono1.ram}">0</span></p>
+                <p><strong>Batería (mAh):</strong> <span th:text="${telefono1.bateria}">0</span></p>
+                <p><strong>Almacenamiento (GB):</strong> <span th:text="${telefono1.almacenamiento}">0</span></p>
+                <p><strong>CPU:</strong> <span th:text="${telefono1.nombreCpu}">N/A</span></p>
+                <a th:href="@{/ventas/detalle/{id}(id=${telefono1.id})}" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Ver Detalles</a>
+            </div>
+
+            <!-- Phone 2 -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4" th:text="${telefono2.nombre}">Teléfono 2</h2>
+                <div th:if="${telefono2.imagenBase64}" class="mb-4">
+                    <img th:src="@{'data:image/jpeg;base64,' + ${telefono2.imagenBase64}}" alt="Imagen del Teléfono" class="w-full h-48 object-cover rounded">
+                </div>
+                <p><strong>Precio:</strong> <span th:text="${telefono2.precio}">0.00</span></p>
+                <p><strong>Estado:</strong> <span th:text="${telefono2.estado}">N/A</span></p>
+                <p><strong>Frecuencia (GHz):</strong> <span th:text="${telefono2.ghz}">0.0</span></p>
+                <p><strong>Cámara (MP):</strong> <span th:text="${telefono2.camara}">0</span></p>
+                <p><strong>RAM (GB):</strong> <span th:text="${telefono2.ram}">0</span></p>
+                <p><strong>Batería (mAh):</strong> <span th:text="${telefono2.bateria}">0</span></p>
+                <p><strong>Almacenamiento (GB):</strong> <span th:text="${telefono2.almacenamiento}">0</span></p>
+                <p><strong>CPU:</strong> <span th:text="${telefono2.nombreCpu}">N/A</span></p>
+                <a th:href="@{/ventas/detalle/{id}(id=${telefono2.id})}" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Ver Detalles</a>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="text-center mt-8">
+            <a th:href="@{/ventas/detalle/{id}(id=${telefono1.id})}" class="bg-gray-300 text-gray-800 px-6 py-3 rounded hover:bg-gray-400">Volver a Detalles</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center p-4 mt-8">
+        <p>© 2025 CellFinder TechMatch</p>
+        <p>Dirección: la universidad cedesarrollo, Cartagena bolivar</p>
+        <p>Teléfono: +57 3126409354</p>
+        <p>Email: celfinder@gmail.com</p>
+        <p>Integrantes: Edder Espitia y Ruben Ruiz</p>
+    </footer>
+</body>
+</html>
