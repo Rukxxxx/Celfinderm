@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Mercado de Teléfonos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .logo-container img {
+            height: 70px;
+            width: auto;
+            transition: transform 0.3s;
+        }
+        .logo-container:hover img {
+            transform: scale(1.05);
+        }
+        .menu {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+            align-items: center;
+        }
+        .menu li a, .user-btn {
+            color: white;
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        .menu li a:hover {
+            background-color: #34495e;
+            transform: translateY(-2px);
+        }
+        .user-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-btn:hover {
+            background-color: #34495e;
+            transform: translateY(-2px);
+        }
+        .user-btn img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            right: 30px;
+            top: 80px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 200px;
+            z-index: 1000;
+            text-align: left;
+        }
+        .user-dropdown.visible {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        .user-dropdown a, .user-dropdown button {
+            display: block;
+            color: #2c3e50;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .user-dropdown a:hover, .user-dropdown button:hover {
+            background-color: #f0f0f0;
+        }
+        .user-dropdown button {
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+        .logout-box {
+            display: none;
+            position: absolute;
+            right: 30px;
+            top: 80px;
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            z-index: 1001;
+            text-align: center;
+        }
+        .logout-box.visible {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .logout-box p {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        .logout-box button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .logout-box .yes-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .logout-box .yes-btn:hover {
+            background-color: #c0392b;
+        }
+        .logout-box .no-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        .logout-box .no-btn:hover {
+            background-color: #2980b9;
+        }
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .search-form .form-control {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .search-form .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+        .search-form button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .search-form button:hover {
+            background-color: #2980b9;
+        }
+        .card {
+            transition: transform 0.3s;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            transition: opacity 0.3s;
+        }
+        .card-body {
+            padding: 15px;
+        }
+        .card-title {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .card-text {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #2c3e50;
+            color: white;
+            margin-top: 30px;
+        }
+        .footer-content p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .pagination {
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .page-item.active .page-link {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        .page-link {
+            color: #3498db;
+        }
+        .page-link:hover {
+            background-color: #e9ecef;
+        }
+        .botones {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background-color: #7f8c8d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #616a6b;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="https://github.com/Rdrr01/celfinder-resource/blob/main/logo.png?raw=true" alt="Logo CellFinder" class="logo">
+        </div>
+        <nav class="menu-container">
+            <ul class="menu">
+                <li><a href="/ventas/listar">Mercado</a></li>
+                <li class="user-menu">
+                    <button id="username-btn" class="user-btn">
+                        <img id="profile-img" src="https://via.placeholder.com/30" alt="Profile Image">
+                        <span>Cargando...</span>
+                    </button>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <a href="/usuarios/perfil">Ver Perfil</a>
+                        <a href="/ventas/notificaciones">Notificaciones</a>
+                        <button id="logout-option">Cerrar Sesión</button>
+                    </div>
+                    <div class="logout-box" id="logout-box">
+                        <p>¿Estás seguro de cerrar sesión?</p>
+                        <button class="yes-btn">Sí</button>
+                        <button class="no-btn">No</button>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <h1 class="mb-4">Mercado de Teléfonos</h1>
+        <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <form th:action="@{/ventas/buscar}" method="get" class="search-form">
+            <div class="row">
+                <div class="col-md-3">
+                    <input type="text" name="nombre" class="form-control" th:value="${nombre}" placeholder="Nombre del teléfono">
+                </div>
+                <div class="col-md-3">
+                    <select name="estado" class="form-control">
+                        <option value="">Todos los estados</option>
+                        <option value="nuevo" th:selected="${estado == 'nuevo'}">Nuevo</option>
+                        <option value="usado" th:selected="${estado == 'usado'}">Usado</option>
+                        <option value="reacondicionado" th:selected="${estado == 'reacondicionado'}">Reacondicionado</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="precioMin" class="form-control" th:value="${precioMin}" placeholder="Precio mín.">
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="precioMax" class="form-control" th:value="${precioMax}" placeholder="Precio máx.">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-md-4 mb-4" th:each="telefono : ${telefonos}">
+                <a th:href="@{/ventas/detalle/{id}(id=${telefono.id})}" class="text-decoration-none">
+                    <div class="card">
+                        <img th:if="${telefono.imagenBase64}" th:src="@{'data:image/jpeg;base64,' + ${telefono.imagenBase64}}" class="card-img-top" alt="Imagen del teléfono">
+                        <img th:unless="${telefono.imagenBase64}" src="https://via.placeholder.com/300x200" class="card-img-top" alt="Sin imagen">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${telefono.nombre}">Nombre del Teléfono</h5>
+                            <p class="card-text" th:text="'$' + ${#numbers.formatDecimal(telefono.precio, 1, 2)}">Precio</p>
+                            <p class="card-text" th:text="${#temporals.format(telefono.fechaPublicacion, 'dd/MM/yyyy HH:mm')}">Fecha de publicación</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/ventas/buscar(page=0, nombre=${nombre}, estado=${estado}, precioMin=${precioMin}, precioMax=${precioMax})}" th:if="${currentPage > 0}">Primera</a>
+                    <span class="page-link" th:unless="${currentPage > 0}">Primera</span>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/ventas/buscar(page=${currentPage - 1}, nombre=${nombre}, estado=${estado}, precioMin=${precioMin}, precioMax=${precioMax})}" th:if="${currentPage > 0}">«</a>
+                    <span class="page-link" th:unless="${currentPage > 0}">«</span>
+                </li>
+                <li class="page-item active">
+                    <span class="page-link" th:text="${currentPage + 1}"></span>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/ventas/buscar(page=${currentPage + 1}, nombre=${nombre}, estado=${estado}, precioMin=${precioMin}, precioMax=${precioMax})}" th:if="${currentPage < totalPages - 1}">»</a>
+                    <span class="page-link" th:unless="${currentPage < totalPages - 1}">»</span>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/ventas/buscar(page=${totalPages - 1}, nombre=${nombre}, estado=${estado}, precioMin=${precioMin}, precioMax=${precioMax})}" th:if="${currentPage < totalPages - 1}">Última</a>
+                    <span class="page-link" th:unless="${currentPage < totalPages - 1}">Última</span>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="botones">
+            <a th:href="@{/ventas/publicar}" class="btn btn-primary" sec:authorize="hasAnyRole('ROLE_VENDEDOR', 'ROLE_ADMIN')">Publicar Teléfono</a>
+            <a th:href="@{/menu}" class="btn btn-secondary">Volver al Menú</a>
+        </div>
+    </div>
+    <footer>
+        <div class="footer-content">
+            <p>© 2025 CellFinder TechMatch</p>
+            <p>Dirección: la universidad cedesarrollo, Cartagena bolivar</p>
+            <p>Teléfono: +57 3126409354</p>
+            <p>Email: edderespitia@gmail.com</p>
+            <p>integrantes: Edder Espitia y Ruben Ruiz</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch username and profile image
+            fetch('/api/user', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const usernameBtn = document.getElementById('username-btn');
+                const profileImg = document.getElementById('profile-img');
+                usernameBtn.querySelector('span').textContent = `Bienvenido, ${data.nombreUsuario}`;
+                if (data.imgperfil) {
+                    profileImg.src = `data:image/jpeg;base64,${data.imgperfil}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user data:', error);
+                const usernameBtn = document.getElementById('username-btn');
+                usernameBtn.querySelector('span').textContent = 'Bienvenido, Invitado';
+            });
+
+            // User dropdown functionality
+            const usernameBtn = document.getElementById('username-btn');
+            const userDropdown = document.getElementById('user-dropdown');
+            const logoutOption = document.getElementById('logout-option');
+            const logoutBox = document.getElementById('logout-box');
+            const yesBtn = logoutBox.querySelector('.yes-btn');
+            const noBtn = logoutBox.querySelector('.no-btn');
+
+            usernameBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('visible');
+                logoutBox.classList.remove('visible');
+            });
+
+            document.addEventListener('click', function() {
+                userDropdown.classList.remove('visible');
+                logoutBox.classList.remove('visible');
+            });
+
+            userDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            logoutOption.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.remove('visible');
+                logoutBox.classList.toggle('visible');
+            });
+
+            logoutBox.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            yesBtn.addEventListener('click', function() {
+                window.location.href = '/logout';
+            });
+
+            noBtn.addEventListener('click', function() {
+                logoutBox.classList.remove('visible');
+            });
+        });
+    </script>
+</body>
+</html>
